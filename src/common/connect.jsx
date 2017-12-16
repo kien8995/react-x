@@ -32,12 +32,12 @@ export class Connect extends Component {
         }
     }
 
-    componentWillUnmount() {
+    componentWillUnmount = () => {
         this.canUpdate = false; // Prevent updates from triggering re-renders after component decides to unmount
         unsubscribe(this.props.source, this.update);
-    }
+    };
 
-    componentWillUpdate(nextProps) {
+    componentWillUpdate = (nextProps) => {
         let oldSource = this.props.source;
         let source = nextProps.source;
         if (source !== oldSource) {
@@ -48,9 +48,9 @@ export class Connect extends Component {
                 console.warn("Tried to use Connect to subscribe to an unpublishable source: ", source);
             }
         }
-    }
+    };
 
-    render() {
+    render = () => {
         return this.props.render(this.props.source, this.props.passProps);
-    }
+    };
 }
