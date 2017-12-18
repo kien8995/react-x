@@ -13,12 +13,12 @@ class App extends Component {
               <img src={logo} className="App-logo" alt="logo"/>
               <h1 className="App-title">React X</h1>
           </header>
-          <p className="App-intro">
+          <div className="App-intro">
               <Component1/>
               <Component2/>
               <Component3/>
               <Component4/>
-          </p>
+          </div>
       </div>;
   }
 }

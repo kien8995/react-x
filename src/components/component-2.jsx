@@ -5,9 +5,7 @@ import store from './store-1';
 export default class Component2 extends XComponent {
     constructor(props, context) {
         super(props, context);
-        this.state = {
-            count: 0
-        }
+        this.state = store.getState();
     }
 
     subscriber = (value) => {
