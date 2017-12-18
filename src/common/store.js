@@ -1,12 +1,17 @@
 import {publish} from '../utils/pub-sub';
+import * as persistentStorage from '../utils/persistent-storage';
 
 export default class Store {
     _initialState = null;
-    state = null;
+    _state = null;
+    _persistentKey = null;
+    _expiry = null;
 
-    constructor(state) {
+    constructor(state, persistentKey = null, expiry = null) {
         this._initialState = this._copyState(state);
-        this.state = this._copyState(state);
+        this._state = persistentStorage.tryGetItem(persistentKey, this._copyState(state));
+        this._persistentKey = persistentKey;
+        this._expiry = expiry;
     }
 
     _copyState = (state) => {
@@ -53,16 +58,16 @@ export default class Store {
     };
 
     getState = () => {
-        return this.state;
+        return this._state;
     };
 
     setState = (newState) => {
         let updated = false;
 
         for (let property in newState) {
-            if (newState.hasOwnProperty(property) && this.state.hasOwnProperty(property)) {
-                if (!this._isEquals(this.state[property], newState[property])) {
-                    this.state[property] = newState[property];
+            if (newState.hasOwnProperty(property) && this._state.hasOwnProperty(property)) {
+                if (!this._isEquals(this._state[property], newState[property])) {
+                    this._state[property] = newState[property];
                     updated = true;
                 }
             }
@@ -70,10 +75,16 @@ export default class Store {
 
         if (updated) {
             publish(this, newState);
+            if (this._persistentKey) {
+                persistentStorage.setItem(this._persistentKey, newState, this._expiry);
+            }
         }
     };
 
     resetState = () => {
         this.setState(this._initialState);
+        if (this._persistentKey) {
+            persistentStorage.removeItem(this._persistentKey);
+        }
     };
 }
