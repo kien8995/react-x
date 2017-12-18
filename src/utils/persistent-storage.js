@@ -154,4 +154,12 @@ export const persistentStorage = {
             return false;
         }
     },
+
+    tryGetItem(key, defaultValue) {
+        if (!this.supportsLocalStorage()) {
+            return defaultValue;
+        }
+        let value = getItem(key);
+        return value === null ? defaultValue : value;
+    }
 };
