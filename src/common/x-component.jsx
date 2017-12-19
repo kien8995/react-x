@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import {Component} from 'react';
 import * as PubSub from '../utils/pub-sub';
 
 export default class XComponent extends Component {
@@ -6,17 +6,11 @@ export default class XComponent extends Component {
         super(props, context);
 
         this._canUpdate = true;
-        this._subscribers = new Map();
-        this.onUnmounts = [];
-        this.onMounts = [];
+        this._subjects = new Map();
     }
 
-    publish = (subject, value) => {
-        PubSub.publish(subject, value);
-    };
-
     subscribe = (subject, subscriber = this.safeUpdate) => {
-        this._subscribers.set(subject, subscriber);
+        this._subjects.set(subject, subscriber);
         return PubSub.subscribe(subject, subscriber);
     };
 
@@ -25,7 +19,7 @@ export default class XComponent extends Component {
     };
 
     unsubscribeAll = () => {
-        for (let [key, value] of this._subscribers) {
+        for (let [key, value] of this._subjects) {
             this.unsubscribe(key, value);
         }
     };
@@ -42,22 +36,8 @@ export default class XComponent extends Component {
         }
     };
 
-    onMount = (f) => {
-        this.onMounts.push(f);
-    };
-
-    onUnmount = (f) => {
-        this.onUnmounts.push(f);
-    };
-
-    componentDidMount = () => {
-        this._canUpdate = true;
-        this.onMounts.forEach((f) => f());
-    };
-
     componentWillUnmount = () => {
         this._canUpdate = false;
-        this.onUnmounts.forEach((f) => f());
         this.unsubscribeAll();
     };
 }
